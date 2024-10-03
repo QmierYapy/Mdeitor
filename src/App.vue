@@ -46,6 +46,7 @@
           v-model="editorData"
           :editor="editor"
           :config="editorConfig"
+          @ready="onEditorReady"
         ></ckeditor>
       </div>
     </v-main>
@@ -98,7 +99,20 @@ export default {
     methods: {
       print(key) {
         alert(JSON.stringify(this.$refs.app.getLayoutItem(key), null, 2))
-        console.log(this)
+        console.log(this.editorInstance)        
+        this.editorInstance.setData('# test')
+      },
+      onEditorReady(editor) {
+        this.editorInstance = editor; // 存储在组件中
+        window.editor = editor; // 将编辑器实例挂载到全局对象
+      },
+      setEditorData(data) {
+        if (this.editorInstance) {
+          this.editorInstance.setData(data); // 使用编辑器实例的 setData() 方法
+        } else {
+          // 如果编辑器尚未准备就绪，可以选择在 editorData 上直接设置
+          this.editorData = data;
+        }
       },
     },
     name: 'EditorFive',
