@@ -1,6 +1,18 @@
 <style>
-.ck-editor__editable_inline {
-  min-height: 500px;
+.ck-editor:not(.ck-comment__input *) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+.ck-editor__main:not(.ck-comment__input *) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+}
+.ck-editor__editable_inline:not(.ck-comment__input *) {
+  flex: 1; 
 }
 </style>
 <template>
@@ -28,14 +40,14 @@
       </v-btn>
     </v-app-bar>
     
-    <v-main style="display: flex;">
-                      <div id="EditorFive" style="flex: 1; height: 100%; overflow: auto;" >
-                        <ckeditor
-                          v-model="editorData"
-                          :editor="editor"
-                          :config="editorConfig"
-                        ></ckeditor>
-                      </div>
+    <v-main style="display: flex; height: 100vh; margin: 0;">
+      <div id="EditorFive" style=" flex: 1; padding: 5px; ">
+        <ckeditor
+          v-model="editorData"
+          :editor="editor"
+          :config="editorConfig"
+        ></ckeditor>
+      </div>
     </v-main>
 
   </v-layout>
@@ -98,7 +110,6 @@ export default {
             editor: ClassicEditor,
             editorData: '<p>Hello from CKEditor 5 in Vue!</p>',
             editorConfig: {
-              height: 500,
                   plugins: [ 
                 SourceEditing,
                 Markdown,
