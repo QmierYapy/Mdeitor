@@ -24,7 +24,7 @@
     </v-app-bar>
     
     <v-main style="display: flex; height: 100vh; margin: 0;">
-      <EditorComponent  ref="editorComponent" />
+      <EditorComponent  @editor-ready="handleEditorReady" />
     </v-main>
 
   </v-layout>
@@ -34,11 +34,18 @@
 import EditorComponent from './main_corner/ckeditor.vue'; // 引入新的組件
 export default {
     methods: {
+      handleEditorReady(editor)
+      {        
+        this.editorInstance = editor; // 儲存編輯器實例
+      },
+      callEditorMethod() {
+        return this.editorInstance; // 返回局部變量
+      },
       setData(data)
       {
           // 確保子組件存在
-          if (this.$refs.editorComponent) {
-              this.$refs.editorComponent.setEditorData(data); // 呼叫子組件的方法
+          if (this.editorInstance) {
+            this.editorInstance.setEditorData(data); // 呼叫子組件的方法
           } else {
               console.error('editorComponent ref 不存在');
           }
@@ -48,5 +55,14 @@ export default {
       EditorComponent,
       
     },
-};
+    data() {
+        return {
+            editorInstance: null // 用於儲存編輯器實例
+        };
+    },
+    mounted() {
+        window.app = this; // 將 Vue 實例掛載到 window 對象
+    }
+  };
+  
 </script>

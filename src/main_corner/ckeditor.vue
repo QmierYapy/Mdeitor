@@ -73,7 +73,7 @@ export default {
         this.editorInstance = editor; // 存储在组件中
         window.editor = editor; // 将编辑器实例挂载到全局对象
         // 這裡可以觸發一個事件，讓父組件知道編輯器已經準備好
-        //this.$emit('editor-ready', editor);//這是反向對上層的@editor-ready="handleEditorReady"執行動作並帶入參數
+        this.$emit('editor-ready', editor);//這是反向對上層的@editor-ready="handleEditorReady"執行動作並帶入參數
       },
       setEditorData(data) {
         if (this.editorInstance) {
