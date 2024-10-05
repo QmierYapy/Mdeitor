@@ -28,7 +28,8 @@
                 :icon="alert.icon"
                 >
                 {{alert.text}}</v-alert>
-    <v-btn class="mx-auto" variant="text" @click="hide_alert('??','red','mdi-exclamation',1000)">
+    <v-btn color="red" dark @click="delRecord"> Delete this! </v-btn>
+    <v-btn class="mx-auto" variant="text" @click="hide_alert('??','red','mdi-exclamation',1000) ">
         Show alert? {{alert.flag}}
       </v-btn>
     <v-btn class="mx-auto" variant="text" @click="setData('footer')">
@@ -36,15 +37,17 @@
       </v-btn>
     </v-app-bar>
     
-    <v-main style="display: flex; height: 100vh; margin: 0;">
+    <v-main style="display: flex; height: 100vh; margin: 0;">      
       <EditorComponent  @editor-ready="handleEditorReady" />
     </v-main>
+    <ConfirmDlg ref="confirm" />
 
   </v-layout>
 </template>
 
 <script>
 import EditorComponent from './main_corner/ckeditor.vue'; // 引入新的組件
+import ConfirmDlg from './main_corner/ConfirmDlg.vue'; // 引入新的組件
 export default {
     methods: {
       handleEditorReady(editor)
@@ -74,11 +77,23 @@ export default {
           this.alert.flag = false;
           console.log("hide alert after 3 seconds");
         }, time)    
-      }
+      },
+      async delRecord() {
+        if (await this.$refs.confirm.open(
+            "Confirm",
+            "Are you sure you want to delete this record?"
+          )
+        ) {
+          this.deleteRecord();
+        }
+      },
+      deleteRecord() {
+        console.log("Record deleted.");
+      },
     },
     components: {
       EditorComponent,
-      
+      ConfirmDlg,      
     },
     data() {
         return {
