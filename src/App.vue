@@ -18,6 +18,19 @@
       name="app-bar"
     >
     
+    <v-alert
+                v-model="alert.flag"
+                dark
+                :color="alert.color"
+                border="top"
+                transition="slide-y-transition"                
+                density="compact"
+                :icon="alert.icon"
+                >
+                {{alert.text}}</v-alert>
+    <v-btn class="mx-auto" variant="text" @click="hide_alert('??','red','mdi-exclamation',1000)">
+        Show alert? {{alert.flag}}
+      </v-btn>
     <v-btn class="mx-auto" variant="text" @click="setData('footer')">
         Set data
       </v-btn>
@@ -45,10 +58,22 @@ export default {
       {
           // 確保子組件存在
           if (this.editorInstance) {
-            this.editorInstance.setEditorData(data); // 呼叫子組件的方法
+            this.editorInstance.setData(data); // 呼叫子組件的方法
+            this.hide_alert('Save success!!','green','mdi-content-save',2000)
           } else {
               console.error('editorComponent ref 不存在');
           }
+      },
+      hide_alert(text,color,icon,time) {
+        console.log('alart')
+        this.alert.flag = true;
+        this.alert.text=text;
+        this.alert.color=color;
+        this.alert.icon=icon;
+        window.setTimeout(() => {
+          this.alert.flag = false;
+          console.log("hide alert after 3 seconds");
+        }, time)    
       }
     },
     components: {
@@ -57,7 +82,9 @@ export default {
     },
     data() {
         return {
-            editorInstance: null // 用於儲存編輯器實例
+            editorInstance: null, // 用於儲存編輯器實例
+            alert: {flag : false,text:'',color:'red',icon:''},    
+
         };
     },
     mounted() {
