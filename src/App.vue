@@ -35,8 +35,21 @@
       name="app-bar"
     >
     
+    <v-alert
+                v-model="alert.flag"
+                dark
+                :color="alert.color"
+                border="top"
+                transition="slide-y-transition"                
+                density="compact"
+                :icon="alert.icon"
+                >
+                {{alert.text}}</v-alert>
     <v-btn class="mx-auto" variant="text" @click="print('footer')">
-        Set data
+        save
+      </v-btn>
+    <v-btn class="mx-auto" variant="text" @click="hide_alert('show','red','mdi-home',1000)">
+        Show alert? {{alert.flag}}
       </v-btn>
     </v-app-bar>
     
@@ -97,10 +110,11 @@ import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 import 'ckeditor5/ckeditor5.css';
 export default {
     methods: {
-      print(key) {
-        alert(JSON.stringify(this.$refs.app.getLayoutItem(key), null, 2))
-        console.log(this.editorInstance)        
-        this.editorInstance.setData('# test')
+      print() {
+        //alert(JSON.stringify(this.$refs.app.getLayoutItem(key), null, 2))
+        this.editorInstance.setData('# test');
+        console.log('alart true')
+        this.hide_alert('save success','green','mdi-content-save',2000)
       },
       onEditorReady(editor) {
         this.editorInstance = editor; // 存储在组件中
@@ -114,13 +128,25 @@ export default {
           this.editorData = data;
         }
       },
+      hide_alert(text,color,icon,time) {
+        console.log('alart')
+        this.alert.flag = true;
+        this.alert.text=text;
+        this.alert.color=color;
+        this.alert.icon=icon;
+        window.setTimeout(() => {
+          this.alert.flag = false;
+          console.log("hide alert after 3 seconds");
+        }, time)    
+      }
     },
     name: 'EditorFive',
     components: {
         Ckeditor
     },
     data() {
-        return {
+        return {          
+            alert: {flag : false,text:'',color:'red',icon:''},            
             editor: ClassicEditor,
             editorData: '<p>Hello from CKEditor 5 in Vue!</p>',
             editorConfig: {
