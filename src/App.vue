@@ -1,9 +1,9 @@
 <template>
   <v-layout ref="app" class="rounded rounded-md" fluid style="height: 100vh;">
-    <v-navigation-drawer color="grey-darken-2" permanent width="100" name="app-bar2">
+    <v-navigation-drawer color="grey-darken-2" permanent width="200" name="app-bar2">
       <v-list-item title="My Application" subtitle="Vuetify"></v-list-item>
       <v-divider></v-divider>
-      <v-list-item link title="List Item 1"></v-list-item>
+      <v-list-item link title="選擇資料夾"  @click="choseDir()"></v-list-item>
       <v-list-item link title="List Item 2"></v-list-item>
       <v-list-item link title="List Item 3"></v-list-item>
     </v-navigation-drawer>
@@ -84,6 +84,14 @@ export default {
     deleteRecord() {
       console.log("Record deleted.");
     },
+    async choseDir(){
+        const selectedDirectory = await window.electronAPI.selectDirectory()
+        if (selectedDirectory) {
+            //loadFolderList(selectedDirectory);
+            this.currentFilePath = selectedDirectory; // 更新当前路径
+            this.setData(this.currentFilePath);
+        }
+    },
   },
   components: {
     EditorComponent,
@@ -93,6 +101,7 @@ export default {
     return {
       editorInstance: null, // 用於儲存編輯器實例
       alert: { flag: false, text: '', color: 'red', icon: '' },
+      currentFilePath : '',
     };
   },
   mounted() {
