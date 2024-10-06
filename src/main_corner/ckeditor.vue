@@ -16,7 +16,7 @@
 }
 </style>
 <template>
-      <div id="EditorFive" style=" flex: 1; padding: 5px; ">
+      <div id="EditorFive" style=" flex: 1; padding: 5px; overflow: auto;">
         <ckeditor
           v-model="editorData"
           :editor="editor"
@@ -120,7 +120,8 @@ export default {
                 FindAndReplace,
                 HtmlEmbed,
             ],
-            toolbar: [
+            toolbar: {
+              items: [
                 'undo', 'redo', 'findAndReplace',
                 '|', 
                 'sourceEditing',
@@ -135,8 +136,9 @@ export default {
                 '|',
                 'outdent', 'indent', 
                 '|',
-                'showBlocks', 'htmlEmbed'
-            ],
+                'showBlocks', 'htmlEmbed'],
+                shouldNotGroupWhenFull: false/*工具列超過換行還是變成...*/ 
+            },
             heading: {
                 options: [
                     { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
