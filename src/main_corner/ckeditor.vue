@@ -68,6 +68,7 @@ import {
 import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 import 'ckeditor5/ckeditor5.css';
 export default {
+  emits: ['editor-ready'], // 宣告自定義事件
     methods: {
       onEditorReady(editor) {
         // 這裡可以觸發一個事件，讓父組件知道編輯器已經準備好

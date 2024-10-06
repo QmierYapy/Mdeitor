@@ -1,11 +1,7 @@
 <template>
   <v-layout ref="app" class="rounded rounded-md" fluid style="height: 100vh;">
     <v-navigation-drawer color="grey-darken-2" permanent width="200" name="app-bar2">
-      <v-list-item title="My Application" subtitle="Vuetify"></v-list-item>
-      <v-divider></v-divider>
-      <v-list-item link title="選擇資料夾"  @click="choseDir()"></v-list-item>
-      <v-list-item link title="List Item 2"></v-list-item>
-      <v-list-item link title="List Item 3"></v-list-item>
+      <FileExplorer @chose-path="handleChosePath" />
     </v-navigation-drawer>
 
     <v-app-bar 
@@ -47,6 +43,7 @@
 <script>
 import EditorComponent from './main_corner/ckeditor.vue'; // 引入新的組件
 import ConfirmDlg from './main_corner/ConfirmDlg.vue'; // 引入新的組件
+import FileExplorer from './navigation_corner/file_explorer.vue'; // 引入新的組件
 
 export default {
   methods: {
@@ -84,18 +81,18 @@ export default {
     deleteRecord() {
       console.log("Record deleted.");
     },
-    async choseDir(){
-        const selectedDirectory = await window.electronAPI.selectDirectory()
-        if (selectedDirectory) {
+    handleChosePath(path){
+        if (path) {
             //loadFolderList(selectedDirectory);
-            this.currentFilePath = selectedDirectory; // 更新当前路径
-            this.setData(this.currentFilePath);
+            this.currentFilePath = path; // 更新当前路径
+            this.setData(path);
         }
     },
   },
   components: {
     EditorComponent,
     ConfirmDlg,
+    FileExplorer,
   },
   data() {
     return {

@@ -13,20 +13,21 @@ ipcMain.handle('dialog:selectDirectory', async () => {
 // 处理加载文件夹结构的请求
 ipcMain.handle('fs:loadFolderStructure', async (event, directoryPath) => {
   function getFolderStructure(dir) {
-    const structure = { folders: [], files: [] };
+    const structure = [];
     fs.readdirSync(dir).forEach(file => {
       const filePath = path.join(dir, file);
       const stats = fs.statSync(filePath);
+      const filetype = file.split('.').pop();
       if (stats.isDirectory()) {
-        structure.folders.push({
-          name: file,
+        structure.push({
+          title: file,
           path: filePath,
-          content: getFolderStructure(filePath) // 递归处理子文件夹
         });
       } else {
-        structure.files.push({
-          name: file,
-          path: filePath
+        structure.push({
+          title: file,
+          path: filePath,
+          filetype:filetype,
         });
       }
     });
