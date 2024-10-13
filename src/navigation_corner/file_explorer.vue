@@ -2,27 +2,21 @@
     <v-list-item title="My Application" subtitle="Vuetify"></v-list-item>
     <v-divider></v-divider>
     <v-list-item link title="選擇資料夾"  @click="choseDir()"></v-list-item>
-    <v-list-item link title="List Item 2"></v-list-item>
+    <v-list-item link title="Temp"  ></v-list-item>
     <v-treeview
         :items="file_item"
-        :opened="initiallyOpen"
-        density="compact"
-        activatable
-        open-on-click
-       
+        return-object
+        v-model:selected="selection"
+        @click:select="printactive()"
     >
         <template v-slot:prepend="{ item, isOpen } "> 
-            <div @click="onItemClick(item)" >
                 <v-icon v-if="!item.filetype">
                     {{ isOpen ? 'mdi-folder-open' : 'mdi-folder' }}
                 </v-icon>
                 <v-icon v-else>
                     {{ files[item.filetype] }}
                 </v-icon>
-                {{item.title }}
-            </div>
-        </template>  
-
+        </template>
   </v-treeview>
   <!--<pre>{{ file_item }}</pre>-->
 
@@ -40,24 +34,31 @@ export default {
             this.file_item = structure; // 將 structure 轉換為 JSON
             this.$emit('chose-path', JSON.stringify(this.file_item));//這是反向對上層執行動作並帶路徑
         },
-        onItemClick(item) {
-        // 在這裡處理點擊事件
-        console.log('點擊了項目：',item);
-        // 您可以在這裡執行打開文件、導航等操作
-        },
+
+        printSelection() {
+            this.$nextTick(() => {
+                console.log('選中項目：', this.selection[0]);
+            });
+  },
         async choseDir(){
             const selectedDirectory = await window.electronAPI.selectDirectory()
             if (selectedDirectory) {
                 this.currentFilePath = selectedDirectory; // 更新当前路径
-                this.loadFolderList(selectedDirectory)
+                    this.loadFolderList(selectedDirectory)
                 //this.$emit('chose-path', this.currentFilePath);//這是反向對上層執行動作並帶路徑
             }
         },
     },
+    watch: {
+    //selection(newSelection) {
+   //     console.log('觸發更新：', newSelection[0]);
+   // }
+    },
+
     data() {
         return {
             currentFilePath : '',
-            active: [],
+            selection: [],
             file_item:[
                 {
                     title: '.git',
