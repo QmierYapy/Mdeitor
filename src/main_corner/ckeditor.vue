@@ -4,6 +4,7 @@
   flex-direction: column;
   flex: 1;
   height: 100%;
+  overflow-y: auto;
 }
 .ck-editor__main:not(.ck-comment__input *) {
   display: flex;
@@ -14,6 +15,16 @@
 .ck-editor__editable_inline:not(.ck-comment__input *) {
   flex: 1; 
 }
+
+.ck-source-editing-area {
+  overflow: hidden; /* 控制編輯區域的滾動 */
+}
+
+.ck-source-editing-area textarea {
+  overflow: auto; /* 設定 overflow 的行為 */
+}
+
+
 </style>
 <template>
       <div id="EditorFive" style=" flex: 1; padding: 5px; overflow: auto;">

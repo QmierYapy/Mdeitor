@@ -13,25 +13,28 @@ ipcMain.handle('dialog:selectDirectory', async () => {
 // 处理加载文件夹结构的请求
 ipcMain.handle('fs:loadFolderStructure', async (event, directoryPath) => {
   function getFolderStructure(dir) {
-    const structure = [];
+    const folders = [];
+    const files = [];
     fs.readdirSync(dir).forEach(file => {
       const filePath = path.join(dir, file);
       const stats = fs.statSync(filePath);
       const filetype = file.split('.').pop();
+
       if (stats.isDirectory()) {
-        structure.push({
+        folders.push({
           title: file,
           path: filePath,
+          children: [],
         });
       } else {
-        structure.push({
+        files.push({
           title: file,
+          filetype: filetype,
           path: filePath,
-          filetype:filetype,
         });
       }
     });
-    return structure;
+    return [...folders, ...files];
   }
 
   return getFolderStructure(directoryPath);
@@ -39,6 +42,7 @@ ipcMain.handle('fs:loadFolderStructure', async (event, directoryPath) => {
 
 // 处理文件内容读取
 ipcMain.handle('fs:loadFileContent', async (event, filePath) => {
+  console.log('ELEPATH:', filePath);
   try {
     const data = fs.readFileSync(filePath, 'utf-8');
     return data;

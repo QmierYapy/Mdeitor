@@ -1,7 +1,7 @@
 <template>
   <v-layout ref="app" class="rounded rounded-md" fluid style="height: 100vh;">
-    <v-navigation-drawer color="grey-darken-2" permanent width="200" name="app-bar2">
-      <FileExplorer @chose-path="handleChosePath" />
+    <v-navigation-drawer color="grey-darken-2" permanent width="200" name="app-bar2" >
+      <FileExplorer @chose-path="handleChosePath" @read-path="handleReadPath"/>
     </v-navigation-drawer>
 
     <v-app-bar 
@@ -86,6 +86,17 @@ export default {
             //loadFolderList(selectedDirectory);
             this.currentFilePath = path; // 更新当前路径
             this.setData(path);
+        }
+    },
+    async handleReadPath(path){
+        if (path) {
+          if (path.startsWith('"') && path.endsWith('"')) {
+            // 去除開頭和結尾的引號
+            path = path.slice(1, -1);
+          }
+          console.log("PATH.",path  );
+            const data = await window.electronAPI.loadFileContent(path);
+            this.setData(data);
         }
     },
   },
