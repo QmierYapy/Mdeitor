@@ -7,7 +7,7 @@
         :items="file_item"
         return-object
         v-model:selected="selection"
-        @click:select="printactive()"
+        @click:select="selectEvent()"
     >
         <template v-slot:prepend="{ item, isOpen } "> 
                 <v-icon v-if="!item.filetype">
@@ -34,12 +34,12 @@ export default {
             this.file_item = structure; // 將 structure 轉換為 JSON
             this.$emit('chose-path', JSON.stringify(this.file_item));//這是反向對上層執行動作並帶路徑
         },
-
-        printSelection() {
+        selectEvent() {
             this.$nextTick(() => {
-                console.log('選中項目：', this.selection[0]);
+                this.$emit('chose-path', JSON.stringify(this.selection[0]));//這是反向對上層執行動作並帶路徑
+                this.selection=[];
             });
-  },
+        },
         async choseDir(){
             const selectedDirectory = await window.electronAPI.selectDirectory()
             if (selectedDirectory) {
@@ -50,14 +50,13 @@ export default {
         },
     },
     watch: {
-    //selection(newSelection) {
-   //     console.log('觸發更新：', newSelection[0]);
-   // }
+        currentFilePath(newcurrentFilePath) {
+            console.log('觸發更新：', newcurrentFilePath);
+        },
     },
-
     data() {
         return {
-            currentFilePath : '',
+            currentFilePath : [],
             selection: [],
             file_item:[
                 {
