@@ -4,6 +4,7 @@
   flex-direction: column;
   flex: 1;
   height: 100%;
+  overflow-y: auto;
 }
 .ck-editor__main:not(.ck-comment__input *) {
   display: flex;
@@ -14,9 +15,19 @@
 .ck-editor__editable_inline:not(.ck-comment__input *) {
   flex: 1; 
 }
+
+.ck-source-editing-area {
+  overflow: hidden; /* 控制編輯區域的滾動 */
+}
+
+.ck-source-editing-area textarea {
+  overflow: auto; /* 設定 overflow 的行為 */
+}
+
+
 </style>
 <template>
-      <div id="EditorFive" style=" flex: 1; padding: 5px; ">
+      <div id="EditorFive" style=" flex: 1; padding: 5px; overflow: auto;">
         <ckeditor
           v-model="editorData"
           :editor="editor"
@@ -68,6 +79,7 @@ import {
 import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 import 'ckeditor5/ckeditor5.css';
 export default {
+  emits: ['editor-ready'], // 宣告自定義事件
     methods: {
       onEditorReady(editor) {
         // 這裡可以觸發一個事件，讓父組件知道編輯器已經準備好
@@ -120,7 +132,8 @@ export default {
                 FindAndReplace,
                 HtmlEmbed,
             ],
-            toolbar: [
+            toolbar: {
+              items: [
                 'undo', 'redo', 'findAndReplace',
                 '|', 
                 'sourceEditing',
@@ -135,8 +148,9 @@ export default {
                 '|',
                 'outdent', 'indent', 
                 '|',
-                'showBlocks', 'htmlEmbed'
-            ],
+                'showBlocks', 'htmlEmbed'],
+                shouldNotGroupWhenFull: false/*工具列超過換行還是變成...*/ 
+            },
             heading: {
                 options: [
                     { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
