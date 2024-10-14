@@ -48,7 +48,7 @@ import FileExplorer from './navigation_corner/file_explorer.vue'; // 引入新�
 export default {
   methods: {
     handleEditorReady(editor) {
-      this.editorInstance = editor; // 儲存編輯器實例
+      this.editorInstance = editor; // 儲存編輯器實例         
     },
     callEditorMethod() {
       return this.editorInstance; // 返回局部變量
@@ -63,14 +63,14 @@ export default {
       }
     },
     hide_alert(text, color, icon, time) {
-      console.log('alert');
+      //console.log('alert');
       this.alert.flag = true;
       this.alert.text = text;
       this.alert.color = color;
       this.alert.icon = icon;
       window.setTimeout(() => {
         this.alert.flag = false;
-        console.log("hide alert after 3 seconds");
+        //console.log("hide alert after 3 seconds");
       }, time);
     },
     async delRecord() {
@@ -85,7 +85,7 @@ export default {
         if (path) {
             //loadFolderList(selectedDirectory);
             this.currentFilePath = path; // 更新当前路径
-            this.setData(path);
+            //this.setData(path);
         }
     },
     async handleReadPath(path){
@@ -93,10 +93,13 @@ export default {
           if (path.startsWith('"') && path.endsWith('"')) {
             // 去除開頭和結尾的引號
             path = path.slice(1, -1);
-          }
+          }          
           console.log("PATH.",path  );
+          if (await this.$refs.confirm.open("載入檔案", "確定要載入此檔案?")) {
             const data = await window.electronAPI.loadFileContent(path);
+            console.log(data);
             this.setData(data);
+          }
         }
     },
   },

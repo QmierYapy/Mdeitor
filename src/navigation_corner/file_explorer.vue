@@ -26,7 +26,7 @@
 //import FileExplorerTreeview from './navigation_corner/file_explorer_treeview.vue'; // 引入新的組件
 
 export default {
-    emits: ['chose-path'], // 宣告自定義事件
+    emits: ['chose-path','read-path'], // 宣告自定義事件
     methods: {
         async loadFolderList(directoryPath) {
             const structure = await window.electronAPI.loadFolderStructure(directoryPath);

@@ -41,7 +41,7 @@
 import { 
     SourceEditing,
     Markdown,
-    Autoformat,
+    //Autoformat,
     PasteFromMarkdownExperimental,
     ClassicEditor,
     Essentials, 
@@ -84,6 +84,30 @@ export default {
       onEditorReady(editor) {
         // 這裡可以觸發一個事件，讓父組件知道編輯器已經準備好
         this.$emit('editor-ready', editor);//這是反向對上層的@editor-ready="handleEditorReady"執行動作並帶入參數
+        // 添加粘貼監聽器，保留表格的 HTML 格式
+        editor.plugins.get('ClipboardPipeline').on('inputTransformation', (evt, data) => {
+        console.log('past event');
+        const viewFragment = data.content;
+        const domConverter = editor.editing.view.domConverter; // 獲取 CKEditor 的 DOM 轉換器
+
+        // 遍歷粘貼內容的子節點
+        for (const viewChild of viewFragment.getChildren()) {
+            if (viewChild.is('element', 'table')) {
+                // 將 viewChild 轉換為 DOM 元素
+                const domElement = domConverter.viewToDom(viewChild, document);
+                
+                // 獲取轉換後的 HTML
+                const tableHtml = domElement.outerHTML;
+
+                // 將 HTML 轉換回 CKEditor 的 View 片段
+                const newViewFragment = editor.data.processor.toView(tableHtml);
+
+                // 更新 data.content 以使用新的 View 片段
+                data.content = newViewFragment;
+                break;
+            }
+        }
+        });
       },
     },
     name: 'EditorFive',
@@ -93,12 +117,12 @@ export default {
     data() {
         return {
             editor: ClassicEditor,
-            editorData: '<p>Hello from CKEditor 5 in Vue!</p>',
+            editorData: '<p>請選擇檔案</p>',
             editorConfig: {
                   plugins: [ 
                 SourceEditing,
                 Markdown,
-                Autoformat,
+                //Autoformat,
                 PasteFromMarkdownExperimental,
                 Essentials, 
                 Heading,
