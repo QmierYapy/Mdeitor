@@ -1,0 +1,12 @@
+diff --git a/node_modules/turndown-plugin-gfm/lib/turndown-plugin-gfm.es.js b/node_modules/turndown-plugin-gfm/lib/turndown-plugin-gfm.es.js
+index fdf05cd..04c4ad2 100644
+--- a/node_modules/turndown-plugin-gfm/lib/turndown-plugin-gfm.es.js
++++ b/node_modules/turndown-plugin-gfm/lib/turndown-plugin-gfm.es.js
+@@ -94,6 +94,7 @@ rules.tableSection = {
+ // - and every cell is a TH
+ function isHeadingRow (tr) {
+   var parentNode = tr.parentNode;
++  return false;
+   return (
+     parentNode.nodeName === 'THEAD' ||
+     (
