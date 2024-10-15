@@ -14,6 +14,7 @@
       <template v-slot:prepend>
         <v-toolbar-items>
           <v-btn variant="tonal" dark @click="Savebtn"> Save this! </v-btn>
+          <v-btn variant="tonal" dark @click="ChosePathbtn"> Chose Path! </v-btn>
           <!-- <v-btn class="mx-auto" variant="tonal" @click="hide_alert('??','red','mdi-exclamation',1000)">
             Show alert? {{ alert.flag }}
           </v-btn> -->
@@ -68,19 +69,24 @@ export default {
       }, time);
     },
     async Savebtn() {
-        if (await this.$refs.confirm.open(
-          "儲存檔案", 
-          "確定儲存此檔案?", 
-          {},
-          "Yes",       // btn1
-          "No"         // btn2
-        )=== 'No') {
-          return; // 如果用戶不想載入新檔案，則退出
-        }
-        if (this.currentFilePath) {
+      if (this.currentFilePath !== '') {
+          if (await this.$refs.confirm.open(
+            "儲存檔案", 
+            "確定儲存此檔案?", 
+            {},
+            "Yes",       // btn1
+            "No"         // btn2
+          )=== 'No') {
+            return; // 如果用戶不想載入新檔案，則退出
+          }
           this.saveFile(this.currentFilePath)
         } else {
-          alert('请先选择要保存的文件。');
+          await this.$refs.confirm.open(
+            "無選擇檔案", 
+            "請先選擇檔案!", 
+            {},
+            "Yes",       // btn1
+          )
         }
 
     },
@@ -174,7 +180,7 @@ export default {
       editorInstance: null, // 用於儲存編輯器實例
       alert: { flag: false, text: '', color: 'red', icon: '' },
       currentPath : '尚未選擇路徑',
-      currentFilePath : '尚未選擇路徑',
+      currentFilePath : '',
       originalHash: '', // 用於存儲原始內容的哈希值
     };
   },
