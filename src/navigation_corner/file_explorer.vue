@@ -1,5 +1,5 @@
 <template>
-    <v-list-item title="My Application" subtitle="Vuetify"></v-list-item>
+    <v-list-item title="QH Editor" subtitle="Markdown with html"></v-list-item>
     <v-divider></v-divider>
     <v-list-item link title="選擇資料夾"  @click="choseDir()"></v-list-item>
     <v-list-item link title="Temp"   @click="checkFile()"></v-list-item>
@@ -19,11 +19,8 @@
                 </v-icon>
         </template>
   </v-treeview>
-  <!--<pre>{{ file_item }}</pre>-->
-
 </template>
 <script>
-//import FileExplorerTreeview from './navigation_corner/file_explorer_treeview.vue'; // 引入新的組件
 
 export default {
     emits: ['chose-path','read-path'], // 宣告自定義事件
@@ -33,12 +30,10 @@ export default {
             //const treeview_structure = this.readDirectoryRecursive(structure);
             //this.file_item = JSON.stringify(structure); // 將 structure 轉換為 JSON
             this.file_item = structure; // 將 structure 轉換為 JSON
-            this.$emit('chose-path', JSON.stringify(this.file_item));//這是反向對上層執行動作並帶路徑
             console.log('Load Folder List:', structure);
         },
         selectEvent() {
             this.$nextTick(() => {
-                this.$emit('chose-path', JSON.stringify(this.selection[0]));//這是反向對上層執行動作並帶路徑
                 this.$emit('read-path', JSON.stringify(this.selection[0].path));//這是反向對上層執行動作並帶路徑
                 this.selection=[];
             });
@@ -52,7 +47,6 @@ export default {
             if (selectedDirectory) {
                 this.currentFilePath = selectedDirectory; // 更新当前路径
                     this.loadFolderList(selectedDirectory)
-                //this.$emit('chose-path', this.currentFilePath);//這是反向對上層執行動作並帶路徑
             }
         },
         checkFile(){
@@ -61,14 +55,17 @@ export default {
     },
     watch: {
         currentFilePath(newcurrentFilePath) {
-            console.log('觸發更新：', newcurrentFilePath);
+            console.log('更新選擇路徑：', newcurrentFilePath);
+            this.$emit('chose-path', JSON.stringify(newcurrentFilePath));//這是反向對上層執行動作並帶路徑
         },
     },
     data() {
         return {
             currentFilePath : [],
             selection: [],
-            file_item:['請選擇路徑'],
+            file_item:[{
+                // title: '---',
+            }],
             initiallyOpen: ['public'],
             files: {
                 html: 'mdi-language-html5',
@@ -79,6 +76,12 @@ export default {
                 png: 'mdi-file-image',
                 txt: 'mdi-file-document-outline',
                 xls: 'mdi-file-excel',
+                ppt: 'mdi-file-powerpoint',
+                doc: 'mdi-file-word',
+                zip: 'mdi-file-zip-box',
+                unknown: 'mdi-file-question',
+                file: 'mdi-file',
+                notfound: 'mdi-file-hidden',
             },
         };
     },

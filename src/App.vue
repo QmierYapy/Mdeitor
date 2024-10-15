@@ -1,21 +1,22 @@
 <template>
   <v-layout ref="app" class="rounded rounded-md" fluid style="height: 100vh;">
+
     <v-navigation-drawer color="grey-darken-2" permanent width="200" name="app-bar2" >
       <FileExplorer @chose-path="handleChosePath" @read-path="handleReadPath"/>
     </v-navigation-drawer>
 
     <v-app-bar 
       color="grey-lighten-2" 
-      flat name="app-bar"
-      title="MD Editor"
+      flat 
+      name="app-bar"
       >
+      <v-toolbar-title class="text-left">{{ currentPath }}</v-toolbar-title>
       <template v-slot:prepend>
         <v-toolbar-items>
-          <v-btn variant="tonal" dark @click="delRecord"> Delete this! </v-btn>
-          <v-btn class="mx-auto" variant="tonal" @click="hide_alert('??','red','mdi-exclamation',1000)">
+          <v-btn variant="tonal" dark @click="Savebtn"> Save this! </v-btn>
+          <!-- <v-btn class="mx-auto" variant="tonal" @click="hide_alert('??','red','mdi-exclamation',1000)">
             Show alert? {{ alert.flag }}
-          </v-btn>
-          <v-btn @click="setData('footer')"> Set data </v-btn>
+          </v-btn> -->
         </v-toolbar-items>
       </template>      
       <v-toolbar-items>          
@@ -36,7 +37,10 @@
     <v-main style="display: flex; height: 100vh; margin: 0;">
       <EditorComponent @editor-ready="handleEditorReady" />
     </v-main>
+
+    <!--確認用容器 -->
     <ConfirmDlg ref="confirm" />
+
   </v-layout>
 </template>
 
@@ -44,23 +48,13 @@
 import EditorComponent from './main_corner/ckeditor.vue'; // 引入新的組件
 import ConfirmDlg from './main_corner/ConfirmDlg.vue'; // 引入新的組件
 import FileExplorer from './navigation_corner/file_explorer.vue'; // 引入新的組件
+// 使用外部的 hash 函數庫，例如 crypto-js
+import CryptoJS from 'crypto-js';
 
 export default {
   methods: {
     handleEditorReady(editor) {
       this.editorInstance = editor; // 儲存編輯器實例         
-    },
-    callEditorMethod() {
-      return this.editorInstance; // 返回局部變量
-    },
-    setData(data) {
-      // 確保子組件存在
-      if (this.editorInstance) {
-        this.editorInstance.setData(data); // 呼叫子組件的方法
-        this.hide_alert('Save success!!', 'green', 'mdi-content-save', 2000);
-      } else {
-        console.error('editorComponent ref 不存在');
-      }
     },
     hide_alert(text, color, icon, time) {
       //console.log('alert');
@@ -73,34 +67,101 @@ export default {
         //console.log("hide alert after 3 seconds");
       }, time);
     },
-    async delRecord() {
-      if (await this.$refs.confirm.open("Confirm", "Are you sure you want to delete this record?")) {
-        this.deleteRecord();
-      }
+    async Savebtn() {
+        if (await this.$refs.confirm.open(
+          "儲存檔案", 
+          "確定儲存此檔案?", 
+          {},
+          "Yes",       // btn1
+          "No"         // btn2
+        )=== 'No') {
+          return; // 如果用戶不想載入新檔案，則退出
+        }
+        if (this.currentFilePath) {
+          this.saveFile(this.currentFilePath)
+        } else {
+          alert('请先选择要保存的文件。');
+        }
+
     },
-    deleteRecord() {
-      console.log("Record deleted.");
+    async saveFile(path)
+    {
+        const editorData = this.editorInstance.getData();
+        await window.electronAPI.saveFile(path, editorData);
+        this.originalHash = CryptoJS.SHA256(editorData).toString();
+        this.hide_alert('Save file success.', 'green', 'mdi-file-check', 3000);
+    },
+    async loadFile(path)
+    {        
+        // 更新目前檔案路徑和內容
+        const data = await window.electronAPI.loadFileContent(path);
+        this.originalHash = CryptoJS.SHA256(data).toString();
+        this.currentFilePath = path;
+        this.editorInstance.setData(data); // 設定編輯器內容
+        this.hide_alert('Read file success.', 'green', 'mdi-file-check', 2000);
     },
     handleChosePath(path){
         if (path) {
-            //loadFolderList(selectedDirectory);
-            this.currentFilePath = path; // 更新当前路径
-            //this.setData(path);
+            if (path.startsWith('"') && path.endsWith('"')) {
+              // 去除開頭和結尾的引號
+              path = path.slice(1, -1);
+            }    
+            this.currentPath =  path.replace(/\\\\/g, '\\'); // 更新当前路径
         }
     },
-    async handleReadPath(path){
-        if (path) {
-          if (path.startsWith('"') && path.endsWith('"')) {
-            // 去除開頭和結尾的引號
-            path = path.slice(1, -1);
-          }          
-          console.log("PATH.",path  );
-          if (await this.$refs.confirm.open("載入檔案", "確定要載入此檔案?")) {
-            const data = await window.electronAPI.loadFileContent(path);
-            console.log(data);
-            this.setData(data);
-          }
+    async handleReadPath(path) {
+      if (path) {
+        if (path.startsWith('"') && path.endsWith('"')) {
+          // 去除開頭和結尾的引號
+          path = path.slice(1, -1);
         }
+        console.log("PATH:", path);
+
+        // 確認是否要載入新檔案
+        if (await this.$refs.confirm.open(
+          "載入檔案", 
+          "確定要載入此檔案?", 
+          {},
+          "Yes",       // btn1
+          "No"         // btn2
+        )=== 'No') {
+          return; // 如果用戶不想載入新檔案，則退出
+        }
+
+        let data = '';
+        let newHash = '';
+        let custumosChose ='';
+        // 如果原始內容哈希不為空，表示已經有檔案被載入
+        if (this.originalHash !== '') {
+          // 讀取文件內容來計算哈希值，但不設置到編輯器中
+          data = this.editorInstance.getData();
+          newHash = CryptoJS.SHA256(data).toString();
+          console.log('current',newHash);
+          console.log('check', data);
+          // 檢查是否有未保存的變更
+          if (this.originalHash !== newHash) {
+            // 確認是否要覆寫
+            custumosChose = await this.$refs.confirm.open(
+              "檔案變更", 
+              "檔案內容尚未儲存，確定要讀取嗎?",
+              {},
+              "取消",       // btn1
+              "儲存",         // btn2
+              "略過",        // btn3
+            );
+          }
+        } 
+        if(custumosChose === "取消")
+        {
+          return; // 
+        }
+        else if(custumosChose === "儲存")
+        {
+          await this.saveFile(path);
+        }
+        this.loadFile(path);
+
+      }
     },
   },
   components: {
@@ -112,7 +173,9 @@ export default {
     return {
       editorInstance: null, // 用於儲存編輯器實例
       alert: { flag: false, text: '', color: 'red', icon: '' },
-      currentFilePath : '',
+      currentPath : '尚未選擇路徑',
+      currentFilePath : '尚未選擇路徑',
+      originalHash: '', // 用於存儲原始內容的哈希值
     };
   },
   mounted() {

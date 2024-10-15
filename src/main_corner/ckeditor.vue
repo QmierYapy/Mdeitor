@@ -41,7 +41,7 @@
 import { 
     SourceEditing,
     Markdown,
-    //Autoformat,
+    Autoformat,
     PasteFromMarkdownExperimental,
     ClassicEditor,
     Essentials, 
@@ -78,6 +78,7 @@ import {
 } from 'ckeditor5';
 import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 import 'ckeditor5/ckeditor5.css';
+
 export default {
   emits: ['editor-ready'], // 宣告自定義事件
     methods: {
@@ -117,12 +118,12 @@ export default {
     data() {
         return {
             editor: ClassicEditor,
-            editorData: '<p>請選擇檔案</p>',
+            editorData: '',
             editorConfig: {
                   plugins: [ 
                 SourceEditing,
                 Markdown,
-                //Autoformat,
+                Autoformat,
                 PasteFromMarkdownExperimental,
                 Essentials, 
                 Heading,
@@ -198,7 +199,7 @@ export default {
             },            
             table: {
                 contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ],
-                defaultHeadings: {}
+                defaultHeadings: {  rows: 1}
             },
             list: {
                 properties: {

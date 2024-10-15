@@ -51,3 +51,14 @@ ipcMain.handle('fs:loadFileContent', async (event, filePath) => {
     throw error;
   }
 });
+
+// 处理文件保存
+ipcMain.handle('fs:saveFile', async (event, filePath, data) => {
+  try {
+    fs.writeFileSync(filePath, data, 'utf-8');
+    return true;
+  } catch (error) {
+    console.error('Failed to save file:', error);
+    throw error;
+  }
+});
