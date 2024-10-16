@@ -14,7 +14,7 @@
       <template v-slot:prepend>
         <v-toolbar-items>
           <v-btn variant="tonal" dark @click="Savebtn"> Save this! </v-btn>
-          <v-btn variant="tonal" dark @click="ChosePathbtn"> Chose Path! </v-btn>
+          <v-btn variant="tonal" dark @click="handleReadPath"> Chose Path! </v-btn>
           <!-- <v-btn class="mx-auto" variant="tonal" @click="hide_alert('??','red','mdi-exclamation',1000)">
             Show alert? {{ alert.flag }}
           </v-btn> -->
@@ -121,7 +121,7 @@ export default {
           // 去除開頭和結尾的引號
           path = path.slice(1, -1);
         }
-        console.log("PATH:", path);
+        // console.log("PATH:", path);
 
         // 確認是否要載入新檔案
         if (await this.$refs.confirm.open(
@@ -142,8 +142,8 @@ export default {
           // 讀取文件內容來計算哈希值，但不設置到編輯器中
           data = this.editorInstance.getData();
           newHash = CryptoJS.SHA256(data).toString();
-          console.log('current',newHash);
-          console.log('check', data);
+          // console.log('current',newHash);
+          // console.log('check', data);
           // 檢查是否有未保存的變更
           if (this.originalHash !== newHash) {
             // 確認是否要覆寫

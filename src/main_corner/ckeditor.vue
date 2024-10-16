@@ -12,18 +12,13 @@
   flex: 1;
   overflow-y: auto;
 }
+
+.ck-content * {
+  padding: revert ; /* 移除全局的 padding 規則並支援ckeditor Indent */
+}
 .ck-editor__editable_inline:not(.ck-comment__input *) {
   flex: 1; 
 }
-
-.ck-source-editing-area {
-  overflow: hidden; /* 控制編輯區域的滾動 */
-}
-
-.ck-source-editing-area textarea {
-  overflow: auto; /* 設定 overflow 的行為 */
-}
-
 
 </style>
 <template>
@@ -85,30 +80,30 @@ export default {
       onEditorReady(editor) {
         // 這裡可以觸發一個事件，讓父組件知道編輯器已經準備好
         this.$emit('editor-ready', editor);//這是反向對上層的@editor-ready="handleEditorReady"執行動作並帶入參數
-        // 添加粘貼監聽器，保留表格的 HTML 格式
-        editor.plugins.get('ClipboardPipeline').on('inputTransformation', (evt, data) => {
-        console.log('past event');
-        const viewFragment = data.content;
-        const domConverter = editor.editing.view.domConverter; // 獲取 CKEditor 的 DOM 轉換器
+        // // 添加粘貼監聽器，保留表格的 HTML 格式
+        // editor.plugins.get('ClipboardPipeline').on('inputTransformation', (evt, data) => {
+        // console.log('past event');
+        // const viewFragment = data.content;
+        // const domConverter = editor.editing.view.domConverter; // 獲取 CKEditor 的 DOM 轉換器
 
-        // 遍歷粘貼內容的子節點
-        for (const viewChild of viewFragment.getChildren()) {
-            if (viewChild.is('element', 'table')) {
-                // 將 viewChild 轉換為 DOM 元素
-                const domElement = domConverter.viewToDom(viewChild, document);
+        // // 遍歷粘貼內容的子節點
+        // for (const viewChild of viewFragment.getChildren()) {
+        //     if (viewChild.is('element', 'table')) {
+        //         // 將 viewChild 轉換為 DOM 元素
+        //         const domElement = domConverter.viewToDom(viewChild, document);
                 
-                // 獲取轉換後的 HTML
-                const tableHtml = domElement.outerHTML;
+        //         // 獲取轉換後的 HTML
+        //         const tableHtml = domElement.outerHTML;
 
-                // 將 HTML 轉換回 CKEditor 的 View 片段
-                const newViewFragment = editor.data.processor.toView(tableHtml);
+        //         // 將 HTML 轉換回 CKEditor 的 View 片段
+        //         const newViewFragment = editor.data.processor.toView(tableHtml);
 
-                // 更新 data.content 以使用新的 View 片段
-                data.content = newViewFragment;
-                break;
-            }
-        }
-        });
+        //         // 更新 data.content 以使用新的 View 片段
+        //         data.content = newViewFragment;
+        //         break;
+        //     }
+        // }
+        // });
       },
     },
     name: 'EditorFive',
