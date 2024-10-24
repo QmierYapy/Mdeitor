@@ -1,8 +1,10 @@
 <template>
+    <div style="display: flex; flex-direction: column; height: 100%;">
     <v-list-item title="QH Editor" subtitle="Markdown with html"></v-list-item>
     <v-divider></v-divider>
     <v-list-item link title="選擇資料夾"  @click="choseDir()"></v-list-item>
     <!-- <v-list-item link title="Temp"   @click="checkFile()"></v-list-item> -->
+     <div style="overflow: auto;">
     <v-treeview
         :items="file_item"
          color="warning"
@@ -21,7 +23,13 @@
                     {{ files[item.filetype]|| 'mdi-file' }}
                 </v-icon>
         </template>
+        <template v-slot:title="{ item } " >                 
+                 <v-tooltip activator="parent" location="end">{{ item.title }}</v-tooltip>
+                 {{  item.title }}
+        </template>
   </v-treeview>
+</div>
+</div>
 </template>
 <script>
 
@@ -53,8 +61,8 @@ export default {
                     this.loadFolderList(selectedDirectory)
             }
         },
-        checkFile(){
-            console.log('目前:',this.file_item);
+        checkFile(item){
+            console.log('目前:',item);
         },
     },
     watch: {
