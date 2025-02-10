@@ -19,7 +19,9 @@
 .ck-editor__editable_inline:not(.ck-comment__input *) {
   flex: 1; 
 }
-
+.ck-source-editing-area textarea:not(.ck-comment__input *) {
+  overflow: auto;
+}
 </style>
 <template>
       <div id="EditorFive" style=" flex: 1; padding: 5px; overflow: auto;">

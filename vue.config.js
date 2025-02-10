@@ -15,9 +15,13 @@ module.exports = defineConfig({
       });
   },
   pluginOptions: {
+    vuetify: {
+      // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
+    },
     electronBuilder: {
       nodeIntegration: false,     // 安全性考量，預設關閉
       contextIsolation: true,     // 強制隔離渲染進程
+      customFileProtocol: './',  // 自訂檔案協議
       preload: 'src/preload.js',  // 預加載腳本（確保安全）
       builderOptions: {
         appId: 'com.example.mdeditor',
