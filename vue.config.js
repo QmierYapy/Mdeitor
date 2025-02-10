@@ -14,10 +14,24 @@ module.exports = defineConfig({
         return definitions;
       });
   },
-
   pluginOptions: {
-    vuetify: {
-      // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
+    electronBuilder: {
+      nodeIntegration: false,     // 安全性考量，預設關閉
+      contextIsolation: true,     // 強制隔離渲染進程
+      preload: 'src/preload.js',  // 預加載腳本（確保安全）
+      builderOptions: {
+        appId: 'com.example.mdeditor',
+        productName: 'mdEditor',
+        extraResources: ['./src/preload.js'],
+        win: {
+          target: ['portable'],  // 免安裝版本
+          icon: 'public/icon.ico'
+        },
+        portable: {
+          artifactName: '${productName}.exe'  // 讓輸出的檔案名稱為
+          // mdEditor.exe
+        }
+      }
     }
   }
 });

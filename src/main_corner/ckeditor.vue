@@ -73,6 +73,7 @@ import {
 } from 'ckeditor5';
 import { Ckeditor } from '@ckeditor/ckeditor5-vue';
 import 'ckeditor5/ckeditor5.css';
+import AddMdTag from './addmdtag/addmdtag';
 
 export default {
   emits: ['editor-ready'], // 宣告自定義事件
@@ -151,6 +152,7 @@ export default {
                 AutoLink,
                 FindAndReplace,
                 HtmlEmbed,
+                AddMdTag
             ],
             toolbar: {
               items: [
@@ -168,7 +170,9 @@ export default {
                 '|',
                 'outdent', 'indent', 
                 '|',
-                'showBlocks', 'htmlEmbed'],
+                'showBlocks', 'htmlEmbed',
+                '|',
+                'addMdTag'],
                 shouldNotGroupWhenFull: false/*工具列超過換行還是變成...*/ 
             },
             heading: {

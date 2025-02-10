@@ -18,7 +18,7 @@ async function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      
+
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       preload: path.join(__dirname, '../src/preload.js'), // 指定 preload script 的路徑
@@ -57,6 +57,10 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+  protocol.registerFileProtocol('app', (request, callback) => {
+    const url = request.url.replace('app://', '');
+    callback({ path: path.join(__dirname, url) });
+  });
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {

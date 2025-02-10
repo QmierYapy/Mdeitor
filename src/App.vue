@@ -92,16 +92,28 @@ export default {
     },
     async saveFile(path)
     {
-        const editorData = this.editorInstance.getData();
+      let editorData = this.editorInstance.getData(); 
+      this.originalHash = CryptoJS.SHA256(editorData).toString();
+        // 替換指定的標籤
+        editorData = editorData.replace(/```html\s*\n<!--\s*tabs:start\s*-->\s*\n```/g, '<!-- tabs:start -->');
+        editorData = editorData.replace(/```html\s*\n<!--\s*tabs:end\s*-->\s*\n```/g, '<!-- tabs:end -->');
+
         await window.electronAPI.saveFile(path, editorData);
-        this.originalHash = CryptoJS.SHA256(editorData).toString();
         this.hide_alert('Save file success.', 'green', 'mdi-file-check', 3000);
     },
     async loadFile(path)
     {        
         // 更新目前檔案路徑和內容
-        const data = await window.electronAPI.loadFileContent(path);
+        let data = await window.electronAPI.loadFileContent(path);
+        // 將 <!-- tabs:start --> 轉換為 Markdown 程式碼區塊
+        data = data.replace(/<!--\s*tabs:start\s*-->/g, '```html\n<!-- tabs:start -->\n```');
+
+        // 將 <!-- tabs:end --> 轉換為 Markdown 程式碼區塊
+        data = data.replace(/<!--\s*tabs:end\s*-->/g, '```html\n<!-- tabs:end -->\n```');
+
+
         this.originalHash = CryptoJS.SHA256(data).toString();
+        console.log('load ori',this.originalHash);
         this.currentFilePath = path;
         this.editorInstance.setData(data); // 設定編輯器內容
         this.hide_alert('Read file success.', 'green', 'mdi-file-check', 2000);
@@ -142,7 +154,8 @@ export default {
           // 讀取文件內容來計算哈希值，但不設置到編輯器中
           data = this.editorInstance.getData();
           newHash = CryptoJS.SHA256(data).toString();
-          // console.log('current',newHash);
+          console.log('current',newHash);
+          console.log('ori',this.originalHash);
           // console.log('check', data);
           // 檢查是否有未保存的變更
           if (this.originalHash !== newHash) {
@@ -151,9 +164,9 @@ export default {
               "檔案變更", 
               "檔案內容尚未儲存，確定要讀取嗎?",
               {},
-              "取消",       // btn1
-              "儲存",         // btn2
-              "略過",        // btn3
+              "取消", // btn1
+              "儲存", // btn2
+              "略過", // btn3
             );
           }
         } 
