@@ -176,7 +176,7 @@ export default {
         }
         else if(custumosChose === "儲存")
         {
-          await this.saveFile(path);
+          await this.saveFile(this.currentFilePath);
         }
         this.loadFile(path);
 
