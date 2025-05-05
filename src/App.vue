@@ -14,8 +14,8 @@
       <template v-slot:prepend>
         <v-toolbar-items>
           <v-btn variant="tonal" dark @click="Savebtn"> Save this! </v-btn>
-          <v-btn variant="tonal" dark @click="handleReadPath"> Chose Path! </v-btn>
-          <!-- <v-btn class="mx-auto" variant="tonal" @click="hide_alert('??','red','mdi-exclamation',1000)">
+          <!--<v-btn variant="tonal" dark @click="handleReadPath"> Copy Path! </v-btn>
+           <v-btn class="mx-auto" variant="tonal" @click="hide_alert('??','red','mdi-exclamation',1000)">
             Show alert? {{ alert.flag }}
           </v-btn> -->
         </v-toolbar-items>
@@ -51,6 +51,8 @@ import ConfirmDlg from './main_corner/ConfirmDlg.vue'; // 引入新的組件
 import FileExplorer from './navigation_corner/file_explorer.vue'; // 引入新的組件
 // 使用外部的 hash 函數庫，例如 crypto-js
 import CryptoJS from 'crypto-js';
+
+import { formatMarkdownWithHtmlBlocks } from './utils/formatMixedMarkdownHtml';
 
 export default {
   methods: {
@@ -90,13 +92,57 @@ export default {
         }
 
     },
+    replaceTabsMarkers(data, reverse = false) {
+      let result = data;
+
+      if (reverse) {
+        // 移除已包裝過的區塊
+        result = result.replace(
+          /```html\s*\n([\s\S]*?)\n```/gi,
+          (_, content) => content
+        );
+
+        // 包裝 <script>
+        result = result.replace(
+          /<script\b[^>]*>[\s\S]*?<\/script>/gi,
+          (match) => '```html\n' + match + '\n```'
+        );
+
+        // 包裝 <div>
+        result = result.replace(
+          /<div\b[^>]*>[\s\S]*?<\/div>/gi,
+          (match) => '```html\n' + match + '\n```'
+        );
+
+        // 包裝 <span>
+        result = result.replace(
+          /<span\b[^>]*>[\s\S]*?<\/span>/gi,
+          (match) => '```html\n' + match + '\n```'
+        );
+
+        // 包裝 HTML 註解
+        result = result.replace(
+          /<!--[\s\S]*?-->/g,
+          (match) => '```html\n' + match + '\n```'
+        );
+
+      } else {
+        // 還原所有包裝
+        result = result.replace(
+          /```html\s*\n([\s\S]*?)\n```/gi,
+          (_, content) => content
+        );
+      }
+
+      return result;
+    },
     async saveFile(path)
     {
-      let editorData = this.editorInstance.getData(); 
-      this.originalHash = CryptoJS.SHA256(editorData).toString();
-        // 替換指定的標籤
-        editorData = editorData.replace(/```html\s*\n<!--\s*tabs:start\s*-->\s*\n```/g, '<!-- tabs:start -->');
-        editorData = editorData.replace(/```html\s*\n<!--\s*tabs:end\s*-->\s*\n```/g, '<!-- tabs:end -->');
+      let editorData = this.editorInstance.getData();         
+        editorData =  this.replaceTabsMarkers(editorData);//替換成doscify可接受的tab flag
+        editorData = editorData.replace(/&nbsp;/g, '');
+        editorData = await formatMarkdownWithHtmlBlocks(editorData); // 使用 AST 處理 HTML 格式化
+        this.originalHash = CryptoJS.SHA256(editorData).toString(); //計算hash
 
         await window.electronAPI.saveFile(path, editorData);
         this.hide_alert('Save file success.', 'green', 'mdi-file-check', 3000);
@@ -104,17 +150,15 @@ export default {
     async loadFile(path)
     {        
         // 更新目前檔案路徑和內容
-        let data = await window.electronAPI.loadFileContent(path);
-        // 將 <!-- tabs:start --> 轉換為 Markdown 程式碼區塊
-        data = data.replace(/<!--\s*tabs:start\s*-->/g, '```html\n<!-- tabs:start -->\n```');
-
-        // 將 <!-- tabs:end --> 轉換為 Markdown 程式碼區塊
-        data = data.replace(/<!--\s*tabs:end\s*-->/g, '```html\n<!-- tabs:end -->\n```');
-
-
-        this.originalHash = CryptoJS.SHA256(data).toString();
+        let data = await window.electronAPI.loadFileContent(path);   
+        data = await formatMarkdownWithHtmlBlocks(data); // 使用 AST 處理 格式化     
+        data = data.replace(/&nbsp;/g, '');
+        this.originalHash = CryptoJS.SHA256(data).toString();//計算hash        
+        data = this.replaceTabsMarkers(data, true);//替換成ckeditor可接受的tab flag
+        
         console.log('load ori',this.originalHash);
         this.currentFilePath = path;
+        this.currentPath = path.replace(/\\\\/g, '\\'); // 更新当前路径
         this.editorInstance.setData(data); // 設定編輯器內容
         this.hide_alert('Read file success.', 'green', 'mdi-file-check', 2000);
     },
@@ -152,7 +196,12 @@ export default {
         // 如果原始內容哈希不為空，表示已經有檔案被載入
         if (this.originalHash !== '') {
           // 讀取文件內容來計算哈希值，但不設置到編輯器中
-          data = this.editorInstance.getData();
+          data = this.editorInstance.getData();       
+          data =  this.replaceTabsMarkers(data);//替換成doscify可接受的tab flag
+          data = data.replace(/&nbsp;/g, '');   
+          data = await formatMarkdownWithHtmlBlocks(data); // 使用 AST 處理 HTML 格式化
+          
+          console.log('loaddata\n',data);
           newHash = CryptoJS.SHA256(data).toString();
           console.log('current',newHash);
           console.log('ori',this.originalHash);

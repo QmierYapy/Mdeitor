@@ -208,6 +208,24 @@ export default {
                     startIndex: true
                 }
             },
+            codeBlock: {
+              languages: [
+                { language: 'plaintext', label: 'Plain text' },
+                { language: 'c', label: 'C' },
+                { language: 'mermaid', label: 'Mermaid' },
+                { language: 'html', label: 'HTML' },
+                { language: 'csharp', label: 'C#' },
+                { language: 'css', label: 'CSS' },
+                { language: 'html', label: 'HTML' },
+                { language: 'java', label: 'Java' },
+                { language: 'javascript', label: 'JavaScript' },
+                { language: 'php', label: 'PHP' },
+                { language: 'python', label: 'Python' },
+                { language: 'typescript', label: 'TypeScript' },
+                { language: 'xml', label: 'XML' }
+                // 加你想要的其他語言
+              ]
+            },
             }
         };
     }
